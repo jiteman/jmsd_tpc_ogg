@@ -12,23 +12,45 @@ set( JMSD_THIS_PROJECT_SOURCE_ROOT ${JMSD_COMPONENT_SOURCE_ROOT_PATH} )
 ## include dependencies
 set( ${PROJECT_NAME}_DEPENDENCY_DIRS_VAR
 	${JMSD_PLATFORM_SOURCES}
-	${JMSD_THIS_PROJECT_SOURCE_ROOT}/include )
+	${JMSD_THIS_PROJECT_SOURCE_ROOT}/include
+	${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/common )
+
+if( UNIX )
+	list( APPEND ${PROJECT_NAME}_DEPENDENCY_DIRS_VAR ${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/linux )
+elseif ( WIN32 )
+	list( APPEND ${PROJECT_NAME}_DEPENDENCY_DIRS_VAR ${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/windows )
+endif()
+
 list( REMOVE_DUPLICATES ${PROJECT_NAME}_DEPENDENCY_DIRS_VAR )
 include_directories( ${${PROJECT_NAME}_DEPENDENCY_DIRS_VAR} )
-
 
 ## this project headers and sources enumeration section
 file( GLOB_RECURSE header_and_source_files
 	${JMSD_THIS_PROJECT_SOURCE_ROOT}/include/*.h*
 	${JMSD_THIS_PROJECT_SOURCE_ROOT}/include/*.c*
 	${JMSD_THIS_PROJECT_SOURCE_ROOT}/src/*.h*
-	${JMSD_THIS_PROJECT_SOURCE_ROOT}/src/*.c*	)
+	${JMSD_THIS_PROJECT_SOURCE_ROOT}/src/*.c*
+	${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/common/*.h*
+	${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/common/*.c* )
+
+if( UNIX )
+	file( GLOB_RECURSE platform_header_and_source_files
+		${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/linux/*.h*
+		${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/linux/*.c* )
+elseif ( WIN32 )
+	file( GLOB_RECURSE platform_header_and_source_files
+		${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/windows/*.h*
+		${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/windows/*.c* )
+endif()
+
+list( APPEND header_and_source_files ${platform_header_and_source_files} )
+
 add_library( ${PROJECT_NAME} SHARED ${header_and_source_files} )
 
 
 ## definition section
 set( ${PROJECT_NAME}_BUILD_DEFINITIONS_VAR
-	-DJMSD_TPC_BASE_LIBRARY_TEMPLATE_SHARED_INTERFACE_INTERNAL )
+	-DJMSD_TPC_OGG_SHARED_INTERFACE_INTERNAL )
 JMSD_LIST_TO_STRING( ${PROJECT_NAME}_BUILD_DEFINITIONS_VAR )
 JMSD_STRING_REMOVE_DUPLICATES( ${PROJECT_NAME}_BUILD_DEFINITIONS_VAR )
 set( ${PROJECT_NAME}_LINK_DEFINITIONS_VAR
